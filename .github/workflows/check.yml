@@ -1,0 +1,45 @@
+name: Lab01 checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cpp:
+    name: C++17 - build and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Compile demo and tests
+        run: |
+          mkdir -p build/cpp
+          g++ -std=c++17 -Wall -Wextra -Wpedantic cpp/Car.cpp cpp/main.cpp -o build/cpp/demo
+          g++ -std=c++17 -Wall -Wextra -Wpedantic cpp/Car.cpp cpp/tests/car_tests.cpp -o build/cpp/tests
+      - name: Run demo
+        run: ./build/cpp/demo
+      - name: Run behavioral tests
+        run: ./build/cpp/tests
+  java:
+    name: Java17 - build and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile demo and tests
+        run: |
+          mkdir -p build/java
+          javac -encoding UTF-8 --release 17 -d build/java java/Car.java java/Main.java java/tests/CarTests.java
+      - name: Run demo
+        run: java -cp build/java Main
+      - name: Run behavioral tests
+        run: java -cp build/java CarTests
